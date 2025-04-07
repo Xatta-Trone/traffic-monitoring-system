@@ -1,7 +1,14 @@
 # 🚗 Real-Time Traffic Monitoring System 🎥
 
 ## 📝 Overview
-A computer vision-based system that tracks vehicles, calculates their speeds, and logs GPS coordinates in real-time using YOLOv8.
+A computer vision-based system that tracks vehicles, calculates their speeds, and logs GPS coordinates in real-time using YOLOv11.
+
+
+
+
+https://github.com/user-attachments/assets/1637e15c-10b3-41cb-9d4d-78570824b695
+
+
 
 ## 🌟 Features
 - 🎯 Real-time vehicle detection and tracking
@@ -72,10 +79,10 @@ Bottom-left: 29.881109, -97.931691
 MIT License
 
 ## 👥 Contributors
-- Your Name (@xatta-trone)
+- Xatta Trone (@xatta-trone)
 
 ## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](link-to-issues).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/Xatta-Trone/traffic-monitoring-system/issues).
 
 ## ⭐ Show your support 
 Give a ⭐️ if this project helped you!
