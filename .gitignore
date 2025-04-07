@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*.so
+.env
+videos/
+*.csv
+!example_output.csv
