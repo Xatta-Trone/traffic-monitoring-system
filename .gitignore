@@ -5,3 +5,4 @@ __pycache__/
 videos/
 *.csv
 !example_output.csv
+roi_coordinates.txt
