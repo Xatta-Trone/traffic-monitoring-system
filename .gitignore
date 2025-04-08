@@ -3,6 +3,6 @@ __pycache__/
 *.so
 .env
 videos/
-*.csv
+
 !example_output.csv
 roi_coordinates.txt

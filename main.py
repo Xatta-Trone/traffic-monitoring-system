@@ -8,6 +8,20 @@ from math import radians, sin, cos, sqrt, atan2
 import csv
 from datetime import datetime
 import os
+import torch
+import torchvision
+
+# Automatically choose device
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f"Using device: {DEVICE}")
+
+print("✅ CUDA available:", torch.cuda.is_available())
+print("🧠 Torch version:", torch.__version__)
+print("🖼️ Torchvision version:", torchvision.__version__)
+print("🖥️ CUDA Device:", torch.cuda.get_device_name(
+    0) if torch.cuda.is_available() else "None")
+
+
 
 video_path = os.path.join('assets', 'input_video.mp4')
 
@@ -280,10 +294,13 @@ print(f"Calculated PIXEL_TO_FEET ratio: {PIXEL_TO_FEET:.4f}")
 print(f"Using smoothing window of {SMOOTHING_WINDOW} frames")
 
 # Path to the video
-output_path = 'output_video_with_polygon.avi'  # Output file
+output_path = os.path.join(
+    'assets', 'output_video_with_polygon.avi')  # Output file
 
 # Load the model
 model = YOLO('yolo11n.pt')
+model.to(DEVICE)  # Move model to the selected device
+
 
 # Get the class list
 class_list = model.names
@@ -332,7 +349,8 @@ while cap.isOpened():
     frame_count += 1  # Increment frame_count
     
     # Run YOLO tracking on the frame
-    results = model.track(frame, persist=True, classes=[0, 1, 2, 3, 5, 6, 7])
+    results = model.track(frame, persist=True, classes=[
+                          0, 1, 2, 3, 5, 6, 7], device=DEVICE)
 
     # Draw the ROI polygons and counting lines
     cv2.polylines(frame, [np.array(roi_points, np.int32)], isClosed=True, color=(0, 0, 255), thickness=2)
