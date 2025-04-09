@@ -14,14 +14,14 @@ import torchvision
 # Automatically choose device
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {DEVICE}")
-
 print("✅ CUDA available:", torch.cuda.is_available())
 print("🧠 Torch version:", torch.__version__)
 print("🖼️ Torchvision version:", torchvision.__version__)
 print("🖥️ CUDA Device:", torch.cuda.get_device_name(
     0) if torch.cuda.is_available() else "None")
 
-video_path = os.path.join('assets', 'input_video.mp4')
+video_name = "output_clip.mp4"
+video_path = os.path.join('assets', video_name)
 
 
 def calculate_distance_feet(lat1, lon1, lat2, lon2):
@@ -30,8 +30,8 @@ def calculate_distance_feet(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
 
@@ -45,7 +45,7 @@ def calculate_pixel_to_feet_ratio(roi_points, point_coordinates):
         pt2 = roi_points[(i + 1) % len(roi_points)]
 
         # Calculate pixel distance
-        pixel_dist = sqrt((pt2[0] - pt1[0])**2 + (pt2[1] - pt1[1])**2)
+        pixel_dist = sqrt((pt2[0] - pt1[0]) ** 2 + (pt2[1] - pt1[1]) ** 2)
         pixel_distances.append(pixel_dist)
 
         # Calculate real distance using GPS
@@ -72,8 +72,8 @@ def interpolate_gps(x, y, roi_points, point_coordinates):
         pt3 = (x, y)
 
         # Calculate triangle area via the shoelace formula
-        area = abs((pt1[0]*(pt2[1]-pt3[1]) + pt2[0] *
-                   (pt3[1]-pt1[1]) + pt3[0]*(pt1[1]-pt2[1]))/2)
+        area = abs((pt1[0] * (pt2[1] - pt3[1]) + pt2[0] *
+                    (pt3[1] - pt1[1]) + pt3[0] * (pt1[1] - pt2[1])) / 2)
         lat1, lon1 = point_coordinates[pt1]
         lat2, lon2 = point_coordinates[pt2]
         avg_lat = (lat1 + lat2) / 2
@@ -84,7 +84,7 @@ def interpolate_gps(x, y, roi_points, point_coordinates):
         total_area += area
 
     if total_area > 0:
-        return weighted_lat/total_area, weighted_lon/total_area
+        return weighted_lat / total_area, weighted_lon / total_area
     return None
 
 
@@ -157,7 +157,7 @@ def calculate_speed(prev_pos, curr_pos, time_elapsed, pixel_to_feet, transform_m
     curr_transformed = transformed_points[1]
     dx = curr_transformed[0] - prev_transformed[0]
     dy = curr_transformed[1] - prev_transformed[1]
-    pixel_dist = np.sqrt(dx*dx + dy*dy)
+    pixel_dist = np.sqrt(dx * dx + dy * dy)
     feet_dist = pixel_dist * pixel_to_feet
     speed_mph = (feet_dist / time_elapsed) * 0.681818
     return speed_mph
@@ -242,7 +242,7 @@ while is_selecting_roi or is_selecting_line:
             cv2.circle(temp_frame, point, 5, (0, 0, 255), -1)
             if point in point_coordinates:
                 lat, lon = point_coordinates[point]
-                cv2.putText(temp_frame, f"{lat:.6f}, {lon:.6f}", (point[0]+10, point[1]-10),
+                cv2.putText(temp_frame, f"{lat:.6f}, {lon:.6f}", (point[0] + 10, point[1] - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
         if len(roi_points) > 1:
             cv2.polylines(temp_frame, [np.array(
@@ -298,7 +298,7 @@ print(f"Video FPS: {fps}")
 print(f"Calculated PIXEL_TO_FEET ratio: {PIXEL_TO_FEET:.4f}")
 print(f"Using smoothing window of {SMOOTHING_WINDOW} frames")
 
-output_path = os.path.join('assets', 'output_video_with_polygon_homography.avi')
+output_path = os.path.join('assets', video_name.replace('.mp4', '_output.avi'))
 
 # Load the YOLO model and move to the selected device
 model = YOLO('yolo11n.pt')
@@ -335,7 +335,8 @@ previous_gps_positions = {}  # For GPS-based speed calculation
 frame_count = 0
 
 # Create CSV file for logging tracking data
-csv_filename = f'tracking_data_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+csv_filename = f"tracking_data_{os.path.splitext(video_name)[0]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+
 with open(csv_filename, 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(['Timestamp', 'Object_ID', 'Object_Type', 'Speed_MPH',
@@ -369,7 +370,18 @@ while cap.isOpened():
     frame_data = []
     current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    if results[0].boxes.data is not None:
+    if results[0].boxes is None or results[0].boxes.data is None:
+        cv2.imshow('Polygon on Frame', frame)
+        out.write(frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        continue
+
+    # Ensure that detections exist before processing
+    if (results is not None and len(results) > 0 and
+        results[0].boxes is not None and
+            hasattr(results[0].boxes, 'data') and results[0].boxes.data is not None and
+            (hasattr(results[0].boxes, 'id') and hasattr(results[0].boxes.id, 'int') and callable(results[0].boxes.id.int))):
         boxes = results[0].boxes.xyxy.cpu()
         track_ids = results[0].boxes.id.int().cpu().tolist()
         class_indices = results[0].boxes.cls.int().cpu().tolist()
@@ -450,7 +462,7 @@ while cap.isOpened():
                             f"Counted: {class_name}, ID: {track_id}, Direction: {direction}")
                         class_counts[class_name] += 1
 
-            # Optionally, for logging you could use the interpolate_gps fallback here
+            # Optionally, use interpolate_gps as a fallback for logging
             interp_gps = interpolate_gps(cx, cy, roi_points, point_coordinates)
             if interp_gps:
                 frame_data.append([
@@ -462,6 +474,9 @@ while cap.isOpened():
                     interp_gps[1],
                     f"({interp_gps[0]:.6f}, {interp_gps[1]:.6f})"
                 ])
+    # else:
+    #     print("No detections found")
+    #     continue
 
     if frame_data and frame_count % fps == 0:
         sorted_frame_data = sorted(frame_data, key=lambda x: x[1])

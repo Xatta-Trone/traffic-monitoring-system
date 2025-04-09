@@ -66,6 +66,19 @@ The system generates a CSV file with the following information:
 - Current Longitude
 - Trajectory Points
 
+## 📊 Sample Data Preview
+Here's a snapshot of the actual tracking data output:
+
+| Timestamp           | Object_ID | Object_Type | Speed_MPH | Current_Lat | Current_Long | Trajectory_Points |
+|--------------------|-----------|-------------|-----------|-------------|--------------|------------------|
+| 2025-04-07 01:47:24| 9         | car         | 4.9       | 29.881146   | -97.931758   | (29.881146, -97.931758) |
+| 2025-04-07 01:47:26| 9         | car         | 5.3       | 29.881126   | -97.931749   | (29.881126, -97.931749) |
+| 2025-04-07 01:47:27| 9         | car         | 6.4       | 29.881113   | -97.931744   | (29.881113, -97.931744) |
+| 2025-04-07 01:47:30| 17        | car         | 4.8       | 29.881164   | -97.931764   | (29.881164, -97.931764) |
+| 2025-04-07 01:47:31| 17        | car         | 4.5       | 29.881137   | -97.931754   | (29.881137, -97.931754) |
+
+> Note: This data shows actual vehicle tracking results with their timestamps, speeds, and GPS coordinates.
+
 ## 🗺️ Coordinate System
 The system uses the following GPS boundaries:
 ```
