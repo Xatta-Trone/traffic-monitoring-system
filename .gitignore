@@ -6,3 +6,5 @@ videos/
 
 !example_output.csv
 roi_coordinates.txt
+
+runs/

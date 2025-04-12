@@ -20,8 +20,14 @@ print("🖼️ Torchvision version:", torchvision.__version__)
 print("🖥️ CUDA Device:", torch.cuda.get_device_name(
     0) if torch.cuda.is_available() else "None")
 
-video_name = "output_clip.mp4"
-video_path = os.path.join('assets', video_name)
+yolo_model_name = 'yolo11m_train.pt'
+video_name = "lbj_trains.mp4"
+video_path = os.path.join('assets', 'small videos', video_name)
+output_path = os.path.join('assets', 'small videos',
+                           video_name.replace('.mp4', '_output.mp4'))
+
+
+
 
 
 def calculate_distance_feet(lat1, lon1, lat2, lon2):
@@ -298,10 +304,10 @@ print(f"Video FPS: {fps}")
 print(f"Calculated PIXEL_TO_FEET ratio: {PIXEL_TO_FEET:.4f}")
 print(f"Using smoothing window of {SMOOTHING_WINDOW} frames")
 
-output_path = os.path.join('assets', video_name.replace('.mp4', '_output.avi'))
+
 
 # Load the YOLO model and move to the selected device
-model = YOLO('yolo11n.pt')
+model = YOLO(yolo_model_name)
 model.to(DEVICE)
 
 # Get the class list for labeling
