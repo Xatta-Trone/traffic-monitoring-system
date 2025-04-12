@@ -5,8 +5,16 @@ A computer vision-based system that tracks vehicles, calculates their speeds, an
 
 
 
-
+### Vehichles
 https://github.com/user-attachments/assets/1637e15c-10b3-41cb-9d4d-78570824b695
+
+
+### Train
+https://github.com/user-attachments/assets/fe75fa8f-6eb2-499b-b981-176086035fe3
+
+
+### Pedestrian-Bicyclists
+https://github.com/user-attachments/assets/d976aef9-aa1d-430a-8e78-5ea377b83f35
 
 
 
